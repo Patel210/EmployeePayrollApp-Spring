@@ -1,33 +1,35 @@
 package com.bridgelabz.employeepayrollapp.services;
 
-import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.bridgelabz.employeepayrollapp.dto.EmployeePayrollDTO;
 import com.bridgelabz.employeepayrollapp.model.EmployeePayrollData;
+import com.bridgelabz.employeepayrollapp.repository.EmployeePayrollDataRepository;
 
 @Service
 public class EmployeePayrollService implements IEmployeePayrollService {
 	
-	private List<EmployeePayrollData> employeePayrollList = new ArrayList();
+	@Autowired
+	private EmployeePayrollDataRepository employeePayrollRepository;
 
 	@Override
 	public List<EmployeePayrollData> getEmployeePayrollData() {
-		return employeePayrollList;
+		return (List<EmployeePayrollData>) employeePayrollRepository.findAll();
 	}
 
 	@Override
 	public EmployeePayrollData getEmployeePayrollDataById(int employeeId) {
-		return employeePayrollList.get(employeeId - 1);
+		return employeePayrollRepository.findById(employeeId).get();
 	}
 
 	@Override
 	public EmployeePayrollData createEmployeePayrollData(EmployeePayrollDTO employeePayrollDTO) {
 		EmployeePayrollData employeePayrollData = null;
-		employeePayrollData = new EmployeePayrollData(employeePayrollList.size() + 1, employeePayrollDTO);
-		employeePayrollList.add(employeePayrollData);
+		employeePayrollData = new EmployeePayrollData(employeePayrollDTO);
+		employeePayrollRepository.save(employeePayrollData);
 		return employeePayrollData;
 	}
 
@@ -36,13 +38,18 @@ public class EmployeePayrollService implements IEmployeePayrollService {
 		EmployeePayrollData employeePayrollData = this.getEmployeePayrollDataById(employeeId);
 		employeePayrollData.setName(employeePayrollDTO.name);
 		employeePayrollData.setSalary(employeePayrollDTO.salary);
-		employeePayrollList.set(employeeId - 1, employeePayrollData);
+		employeePayrollData.setGender(employeePayrollDTO.gender);
+		employeePayrollData.setDepartments(employeePayrollDTO.departments);
+		employeePayrollData.setNotes(employeePayrollDTO.notes);
+		employeePayrollData.setProfilePic(employeePayrollDTO.profilePic);
+		employeePayrollData.setStartDate(employeePayrollDTO.startDate);
+		employeePayrollRepository.save(employeePayrollData);
 		return employeePayrollData;
 	}
 
 	@Override
 	public void deleteEmployeePayrollData(int employeeId) {
-		
+		employeePayrollRepository.deleteById(employeeId);
 	}
 
 }
